@@ -1,3 +1,4 @@
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
@@ -13,8 +14,11 @@ public class app {
 
         imageInfo imageInfo = new imageInfo();
 
-        imageInfo.getImage();
-        imageInfo.outputImage();
+        BufferedImage image = imageInfo.getImage();
+
+        byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+
+        
 
     }
 
