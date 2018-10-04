@@ -1,40 +1,40 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigInteger;
 
 public class ImageParser {
-    private final int payloadSizeInBytes = 83;
-    private final int payloadSizeInBits = payloadSizeInBytes * 8;
-
     private BufferedImage img = null;
-    private byte[] bytes = new byte[230400];
     private String stringRepresent = "";
 
-    public void loadImage() {
+    private void loadImage() {
+        InputStream stream = null;
         try {
-            img = ImageIO.read(new File("stego_cover17.bmp"));
+            stream = new FileInputStream(new File("stego_cover17.bmp"));
+            img = ImageIO.read(stream);
         } catch (IOException e) {
             System.out.println("Failed to load image!");
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ex) {
+                    System.out.println("Error closing input stream!");
+                    ex.printStackTrace();
+                }
+            }
         }
-    }
-
-    public void processUsingLSB() {
-        extractPixels();
-        breakIntoBytes();
-        storeIntoString();
-        writeToFile("LSB.txt");
     }
 
     private void extractPixels() {
         int w = img.getWidth();
         int h = img.getHeight();
-        int count = 0;
 
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
+        for (int i = h - 1; i >= 0; i--) {
+            for (int j = w - 1; j >= 0; j--) {
                 int pixel = img.getRGB(j, i);
-                System.out.println(Integer.toBinaryString(pixel));
-                System.out.println("y:" + i + "x:" + j);
+                System.out.println("x:" + j + "y:" + i);
                 extractAllZeroBits(pixel);
             }
         }
@@ -45,35 +45,13 @@ public class ImageParser {
         zeroBits += (pixel >> 16) & 0x1;
         zeroBits += (pixel >> 8) & 0x1;
         zeroBits += pixel & 0x1;
-        System.out.println(zeroBits);
         stringRepresent = stringRepresent.concat(zeroBits);
     }
 
-    private void breakIntoBytes() {
-        int byteCount = 0;
-        for (int i = 0; i+8 <= stringRepresent.length(); i += 8) {
-            populateByteArray(stringRepresent.substring(i, i+8), byteCount);
-            byteCount++;
-        }
-    }
-
-    private void storeIntoString() {
-        String s = new String(bytes);
-        System.out.println(s);
-    }
-
-    private void populateByteArray(String bytecode, int pos) {
-        int intRepresentation = Integer.parseInt(bytecode);
-        byte byteRepresentation = (byte) intRepresentation;
-        bytes[pos] = byteRepresentation;
-        String s1 = String.format("%8s", Integer.toBinaryString(bytes[pos] & 0xFF)).replace(' ', '0');
-        System.out.println(s1);
-    }
-
-    private void writeToFile(String fileName) {
+    private void writeToFile(byte[] bytes) {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(fileName);
+            fos = new FileOutputStream("processed.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -88,5 +66,16 @@ public class ImageParser {
                 e.printStackTrace();
             }
         }
+    }
+
+    private String getStringRepresent() {
+        return stringRepresent;
+    }
+
+    public static void main(String[] args) {
+        ImageParser parser = new ImageParser();
+        parser.loadImage();
+        parser.extractPixels();
+        parser.writeToFile(new BigInteger(parser.getStringRepresent(), 2).toByteArray());
     }
 }
