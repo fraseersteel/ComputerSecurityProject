@@ -19,7 +19,7 @@ public class ImageParserProper {
         InputStream in = null;
 
         try {
-            in = new FileInputStream(new File("stego_cover17.bmp"));
+            in = new FileInputStream(new File("CS407-Coursework/src/stego_cover17.bmp"));
             int lsb, byt, count = 0;
 
             while (in.available() > 0) {
@@ -62,7 +62,7 @@ public class ImageParserProper {
     }
 
     private void writeToFile() throws Exception {
-        FileOutputStream out = new FileOutputStream(new File("processed.txt"));
+        FileOutputStream out = new FileOutputStream(new File("processedFinal.txt"));
 
         for (int i = 0; i < bytes.size(); i++) {
             out.write(bytes.get(i));
