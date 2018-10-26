@@ -6,9 +6,9 @@ public class TextDecrypter {
     String encryptedMessage;
     char[] decryptedMessage;
     String alphabet = "abcdefghijklmnopqrstuvwxyz";
-    HashMap<Character,Integer> map;
+    HashMap<Character, Integer> map;
 
-    public void readFromFile(){
+    public void readFromFile() {
         encryptedMessage = "";
         decryptedMessage = new char[83];
         File f = new File("processedFinal.txt");
@@ -20,20 +20,20 @@ public class TextDecrypter {
         }
     }
 
-    public Map getFrequencyMap(String sentence){
+    public Map getFrequencyMap(String sentence) {
 
-        map = new HashMap<Character,Integer>();
+        map = new HashMap<Character, Integer>();
+        String withoutSpaces = sentence.replaceAll("\\s+","");
 
-        for(int i = 0; i<sentence.length();i++){
-            char c = sentence.charAt(i);
+        for (int i = 0; i < withoutSpaces.length(); i++) {
+            char c = withoutSpaces.charAt(i);
             Integer value = map.get(c);
-            if(value != null){
-                map.put(c, new Integer(value+1));
+                if (value != null) {
+                    map.put(c, new Integer(value + 1));
+                } else {
+                    map.put(c, 1);
+                }
             }
-            else {
-                map.put(c,1);
-            }
-        }
         System.out.println("unsorted " + map);
         return map;
     }
@@ -41,10 +41,10 @@ public class TextDecrypter {
     public void decrypt() {
 
         OrderMap valueComparator = new OrderMap(getFrequencyMap(encryptedMessage));
-        TreeMap<Character,Integer> sorted = new TreeMap<Character,Integer>(valueComparator);
+        TreeMap<Character, Integer> sorted = new TreeMap<Character, Integer>(valueComparator);
         sorted.putAll(map);
         System.out.println("sorted " + sorted);
-//        String cipherAlphabet = getFrequencyMap(encryptedMessage);
+//       String cipherAlphabet = getFrequencyMap(encryptedMessage);
         String cipherAlphabet = "pzckifgbdakhjlmpqrstuvwxyz";
 
         for (int i = 0; i < encryptedMessage.length(); i++) {
@@ -71,18 +71,18 @@ public class TextDecrypter {
 }
 
 
-class OrderMap implements Comparator<Character>{
-Map<Character,Integer> base;
+class OrderMap implements Comparator<Character> {
+    Map<Character, Integer> base;
 
-    public OrderMap(Map<Character,Integer> base){
+    public OrderMap(Map<Character, Integer> base) {
         this.base = base;
     }
 
     @Override
     public int compare(Character a, Character b) {
-        if(base.get(a) >= base.get(b)){
+        if (base.get(a) >= base.get(b)) {
             return -1;
-        }else{
+        } else {
             return 1;
         }
     }
