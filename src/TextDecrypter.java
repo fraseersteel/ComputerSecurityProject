@@ -6,6 +6,8 @@ public class TextDecrypter {
     String encryptedMessage;
     char[] decryptedMessage;
     String alphabet = "abcdefghijklmnopqrstuvwxyz";
+    String frequency = "etaoinshrdlcumwfgypbvkjxqz";
+    String cipherAlphabet = "";
     HashMap<Character, Integer> map;
 
     public void readFromFile() {
