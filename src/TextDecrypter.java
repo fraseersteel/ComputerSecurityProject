@@ -5,7 +5,6 @@ public class TextDecrypter {
 
     String encryptedMessage;
     char[] decryptedMessage;
-    String alphabet = "abcdefghijklmnopqrstuvwxyz";
     String frequency = "etaoinshrdlcumwfgypbvkjxqz";
     String cipherAlphabet = "";
     HashMap<Character, Integer> map;
@@ -46,17 +45,29 @@ public class TextDecrypter {
         TreeMap<Character, Integer> sorted = new TreeMap<Character, Integer>(valueComparator);
         sorted.putAll(map);
         System.out.println("sorted " + sorted);
-//       String cipherAlphabet = getFrequencyMap(encryptedMessage);
-        String cipherAlphabet = "pzckifgbdakhjlmpqrstuvwxyz";
+        Set<Character> cipherAlpha  = sorted.keySet();
+
+        StringBuilder sb = new StringBuilder();
+        for(Character ch: cipherAlpha){
+            sb.append(ch);
+        }
+        String cipherAlphabet = sb.toString();
+        System.out.println(cipherAlphabet);
+
+
+ //       String cipherAlphabet = "pzckifgbdakhjlmpqrstuvwxyz";
+
 
         for (int i = 0; i < encryptedMessage.length(); i++) {
             if (encryptedMessage.charAt(i) == ' ') {
                 decryptedMessage[i] = ' ';
             } else {
                 int index = cipherAlphabet.indexOf(encryptedMessage.charAt(i));
-                decryptedMessage[i] = alphabet.charAt(index);
+                decryptedMessage[i] = frequency.charAt(index);
             }
         }
+
+        System.out.println(decryptedMessage);
 
     }
 
