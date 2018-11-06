@@ -2,17 +2,56 @@ import java.io.*;
 import java.util.*;
 
 public class TextDecrypter {
+    private String encryptedMessage;
+    private char[] decryptedMessage;
+    private HashMap<Character, Integer> frequencyMap;
+    private List<String> commonWords;
 
-    String encryptedMessage;
-    char[] decryptedMessage;
-    String frequency = "etaoinshrdlcumwfgypbvkjxqz";
-    String cipherAlphabet = "";
-    HashMap<Character, Integer> map;
+    private String frequency = "etaoinshrdlcumwfgypbvkjxqz";
 
-    public void readFromFile() {
+    public TextDecrypter() {
         encryptedMessage = "";
         decryptedMessage = new char[83];
-        File f = new File("processedFinal.txt");
+        commonWords = new ArrayList<>();
+        frequencyMap = new HashMap<>();
+    }
+
+    /*
+        b = h
+        c = c
+        d = i
+        h = l
+        i = e
+        j = m
+        k = d
+        l = n
+        m = o
+        p = a
+        r = r
+        s = s
+        t = t
+        u = u
+        w = w
+        x = x
+        y = y
+    */
+
+    public void loadCommonWords() {
+        String fileName = "common_words.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                commonWords.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readFromFile() {
+        File f = new File("processed.txt");
         try {
             BufferedReader b = new BufferedReader(new FileReader(f));
             encryptedMessage = b.readLine();
@@ -22,41 +61,33 @@ public class TextDecrypter {
     }
 
     public Map getFrequencyMap(String sentence) {
-
-        map = new HashMap<Character, Integer>();
         String withoutSpaces = sentence.replaceAll("\\s+","");
 
         for (int i = 0; i < withoutSpaces.length(); i++) {
             char c = withoutSpaces.charAt(i);
-            Integer value = map.get(c);
+            Integer value = frequencyMap.get(c);
                 if (value != null) {
-                    map.put(c, new Integer(value + 1));
+                    frequencyMap.put(c, new Integer(value + 1));
                 } else {
-                    map.put(c, 1);
+                    frequencyMap.put(c, 1);
                 }
             }
-        System.out.println("unsorted " + map);
-        return map;
+        return frequencyMap;
     }
 
     public void decrypt() {
-
         OrderMap valueComparator = new OrderMap(getFrequencyMap(encryptedMessage));
-        TreeMap<Character, Integer> sorted = new TreeMap<Character, Integer>(valueComparator);
-        sorted.putAll(map);
-        System.out.println("sorted " + sorted);
-        Set<Character> cipherAlpha  = sorted.keySet();
+        TreeMap<Character, Integer> sorted = new TreeMap<>(valueComparator);
+        sorted.putAll(frequencyMap);
+        Set<Character> cipherAlpha = sorted.keySet();
 
         StringBuilder sb = new StringBuilder();
         for(Character ch: cipherAlpha){
             sb.append(ch);
         }
+
         String cipherAlphabet = sb.toString();
         System.out.println(cipherAlphabet);
-
-
- //       String cipherAlphabet = "pzckifgbdakhjlmpqrstuvwxyz";
-
 
         for (int i = 0; i < encryptedMessage.length(); i++) {
             if (encryptedMessage.charAt(i) == ' ') {
@@ -67,7 +98,20 @@ public class TextDecrypter {
             }
         }
 
-        System.out.println(decryptedMessage);
+        String decryptedMessageString = String.valueOf(decryptedMessage);
+        System.out.println(decryptedMessageString);
+
+        StringTokenizer tokeniser = new StringTokenizer(decryptedMessageString, " ");
+        int maxScore = tokeniser.countTokens();
+        int score = 0;
+
+        while (tokeniser.hasMoreElements()) {
+            String token = (String) tokeniser.nextElement();
+            if(commonWords.contains(token)) {
+                score++;
+            }
+        }
+        System.out.println(score);
 
     }
 
@@ -79,6 +123,14 @@ public class TextDecrypter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        TextDecrypter tx = new TextDecrypter();
+        tx.loadCommonWords();
+        tx.readFromFile();
+        tx.decrypt();
+        tx.writeToFile();
     }
 
 }
